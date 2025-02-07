@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ghoul</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f1f1f1;
+        }
+
+        h1 {
+            text-align: center;
+            color: #3498db;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        select, input, button {
+            padding: 10px;
+            margin: 10px 0;
+            width: 100%;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+
+        button {
+            background-color: #3498db;
+            color: white;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #ecf0f1;
+            border-radius: 4px;
+        }
+
+        .error {
+            color: red;
+        }
+
+        .crypto-price {
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        .input-section {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .input-section input {
+            width: 45%;
+        }
+
+        #cryptoChart {
+            max-width: 100%;
+            height: 400px;
+            margin-top: 20px;
+        }
+
+        .person-info img {
+            border-radius: 50%;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Crypto Tracker, Person Generator, and Price Calculator</h1>
+
+    <div class="container">
+        <!-- Crypto Price Section -->
+        <div class="section" id="cryptoSection">
+            <h2>Track Bitcoin Price</h2>
+            <button onclick="getBitcoinPrice()">Get Bitcoin Price</button>
+            <div id="bitcoinPriceResult" class="result"></div>
+            
+            <!-- Price Calculator Section -->
+            <div class="input-section">
+                <input type="number" id="bitcoinAmount" placeholder="Amount of Bitcoin" />
+                <input type="number" id="usdAmount" placeholder="Converted Amount in USD" disabled />
+            </div>
+            <button onclick="calculateBitcoinPrice()">Convert</button>
+        </div>
+
+        <!-- Random Person Generator Section -->
+        <div class="section" id="personGeneratorSection">
+            <h2>Random Person Generator</h2>
+            <button onclick="generateRandomPerson()">Generate Random Person</button>
+            <div id="randomPersonResult" class="result"></div>
+        </div>
+
+        <!-- IP Location Tracker Section -->
+        <div class="section" id="ipTrackerSection">
+            <h2>IP Location Tracker</h2>
+            <input type="text" id="ipInput" placeholder="Enter IP address" />
+            <button onclick="getIpLocation()">Track IP</button>
+            <div id="ipLocationResult" class="result"></div>
+        </div>
+    </div>
+
+    <script>
+        // Function to fetch Bitcoin price
+        async function getBitcoinPrice() {
+            const url = "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd";
+
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                const price = data.bitcoin.usd;
+
+                document.getElementById('bitcoinPriceResult').innerHTML = `
+                    The current price of Bitcoin is $${price}.
+                `;
+            } catch (error) {
+                document.getElementById('bitcoinPriceResult').innerHTML = `
+                    <p class="error">Failed to fetch Bitcoin price. Please try again later.</p>
+                `;
+            }
+        }
+
+        // Function to calculate Bitcoin price based on user input
+        function calculateBitcoinPrice() {
+            const amount = document.getElementById('bitcoinAmount').value;
+            const url = "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd";
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    const price = data.bitcoin.usd;
+                    const total = amount * price;
+                    document.getElementById('usdAmount').value = total.toFixed(2);
+                })
+                .catch(error => alert("Failed to fetch Bitcoin price. Please try again later."));
+        }
+
+        // Function to generate a random person using RandomUser.me API
+        async function generateRandomPerson() {
+            const url = "https://randomuser.me/api/";
+
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                const person = data.results[0];
+
+                const personInfo = `
+                    <div class="person-info">
+                        <img src="${person.picture.large}" alt="${person.name.first} ${person.name.last}" width="100" height="100" />
+                        <h3>Generated Person Information</h3>
+                        <p><strong>Gender:</strong> ${person.gender}</p>
+                        <p><strong>Name:</strong> ${person.name.title} ${person.name.first} ${person.name.last}</p>
+                        <p><strong>Username:</strong> ${person.login.username}</p>
+                        <p><strong>Email:</strong> ${person.email}</p>
+                        <p><strong>Phone:</strong> ${person.phone}</p>
+                        <p><strong>Cell:</strong> ${person.cell}</p>
+                        <p><strong>Location:</strong> ${person.location.street.number} ${person.location.street.name}, ${person.location.city}, ${person.location.state}, ${person.location.country} - ${person.location.postcode}</p>
+                        <p><strong>Coordinates:</strong> Latitude: ${person.location.coordinates.latitude}, Longitude: ${person.location.coordinates.longitude}</p>
+                        <p><strong>Timezone:</strong> ${person.location.timezone.description} (Offset: ${person.location.timezone.offset})</p>
+                        <p><strong>Date of Birth:</strong> ${person.dob.date} (Age: ${person.dob.age})</p>
+                        <p><strong>Nationality:</strong> ${person.nat}</p>
+                        <p><strong>Registered Since:</strong> ${person.registered.date} (Age: ${person.registered.age} years)</p>
+                        <p><strong>Login Details:</strong> UUID: ${person.login.uuid}</p>
+                        <p><strong>ID:</strong> ${person.id.name}: ${person.id.value}</p>
+                    </div>
+                `;
+
+                document.getElementById('randomPersonResult').innerHTML = personInfo;
+            } catch (error) {
+                document.getElementById('randomPersonResult').innerHTML = `
+                    <p class="error">Failed to generate random person. Please try again later.</p>
+                `;
+            }
+        }
+
+        // Function to get IP location using ip-api.com
+        async function getIpLocation() {
+            const ip = document.getElementById('ipInput').value;
+            const url = `http://ip-api.com/json/${ip}`;
+
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+
+                if (data.status === 'fail') {
+                    document.getElementById('ipLocationResult').innerHTML = `
+                        <p class="error">Could not fetch location for IP address: ${ip}</p>
+                    `;
+                } else {
+                    document.getElementById('ipLocationResult').innerHTML = `
+                        <h3>IP Location Information</h3>
+                        <p><strong>IP Address:</strong> ${data.query}</p>
+                        <p><strong>Country:</strong> ${data.country}</p>
+                        <p><strong>Region:</strong> ${data.regionName}</p>
+                        <p><strong>City:</strong> ${data.city}</p>
+                        <p><strong>ZIP:</strong> ${data.zip}</p>
+                        <p><strong>ISP:</strong> ${data.isp}</p>
+                    `;
+                }
+            } catch (error) {
+                document.getElementById('ipLocationResult').innerHTML = `
+                    <p class="error">Failed to fetch IP location. Please try again later.</p>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>
+
+
+
