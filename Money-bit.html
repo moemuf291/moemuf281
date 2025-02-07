@@ -101,6 +101,11 @@
     </div>
 
     <script>
+        // Function to format numbers with commas (thousands separators)
+        function formatNumber(number) {
+            return number.toLocaleString(); // Adds commas for thousands, millions, etc.
+        }
+
         // Function to fetch the current cryptocurrency prices
         async function getCryptoPrices() {
             try {
@@ -114,15 +119,15 @@
                 const priceDisplay = `
                     <div>
                         <img src="https://cryptologos.cc/logos/bitcoin-btc-logo.png" alt="Bitcoin Logo" />
-                        <span>Bitcoin (BTC): $${bitcoinPrice}</span>
+                        <span>Bitcoin (BTC): $${formatNumber(bitcoinPrice)}</span>
                     </div>
                     <div>
                         <img src="https://cryptologos.cc/logos/ethereum-eth-logo.png" alt="Ethereum Logo" />
-                        <span>Ethereum (ETH): $${ethereumPrice}</span>
+                        <span>Ethereum (ETH): $${formatNumber(ethereumPrice)}</span>
                     </div>
                     <div>
                         <img src="https://cryptologos.cc/logos/ripple-xrp-logo.png" alt="Ripple Logo" />
-                        <span>Ripple (XRP): $${ripplePrice}</span>
+                        <span>Ripple (XRP): $${formatNumber(ripplePrice)}</span>
                     </div>
                 `;
                 document.getElementById('cryptoPrices').innerHTML = priceDisplay;
@@ -135,11 +140,11 @@
         // Function to calculate the value of Bitcoin entered
         function calculateBitcoin() {
             const amount = document.getElementById('btcAmount').value;
-            const btcPrice = document.querySelector('#cryptoPrices span').innerText.split('$')[1]; // Get the Bitcoin price dynamically from the page
+            const btcPrice = parseFloat(document.querySelector('#cryptoPrices span').innerText.split('$')[1].replace(/,/g, '')); // Get the Bitcoin price dynamically and remove commas
 
             if (amount && !isNaN(amount) && btcPrice) {
                 const result = (amount * btcPrice).toFixed(2);
-                document.getElementById('btcResult').innerText = `The value of ${amount} Bitcoin is $${result}.`;
+                document.getElementById('btcResult').innerText = `The value of ${amount} Bitcoin is $${formatNumber(result)}.`;
             } else {
                 document.getElementById('btcResult').innerText = "Please enter a valid amount.";
             }
@@ -150,3 +155,4 @@
     </script>
 </body>
 </html>
+
