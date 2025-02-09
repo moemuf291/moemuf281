@@ -5,61 +5,103 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Crypto Marketplace - Admin Panel</title>
     <style>
-        /* Dark Mode Styling */
+        /* General Styles */
         body {
             font-family: 'Arial', sans-serif;
-            background-color: #181818; /* Dark background */
-            color: #ccc; /* Light text for dark theme */
+            background-color: #1E1E2F;
+            color: #ccc;
             margin: 0;
             padding: 20px;
             display: flex;
-            justify-content: space-between; /* Aligns both sections horizontally */
             gap: 30px;
-            flex-wrap: wrap; /* Allows for responsive design */
+            flex-wrap: wrap;
+            height: 100vh;
+            overflow: auto;
         }
 
         h1 {
             text-align: center;
             font-size: 36px;
-            color: #4CAF50; /* Green title */
+            color: #4CAF50;
             width: 100%;
             margin-bottom: 30px;
+            border-bottom: 2px solid #4CAF50;
+            padding-bottom: 10px;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background-color: #2C2C3E;
+            color: #ccc;
+            padding: 20px;
+            width: 250px;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            box-shadow: 4px 0px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .sidebar h2 {
+            font-size: 28px;
+            color: #fff;
+            margin-bottom: 40px;
+        }
+
+        .sidebar a {
+            text-decoration: none;
+            color: #ccc;
+            display: block;
+            padding: 15px;
+            font-size: 18px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            transition: background-color 0.3s;
+        }
+
+        .sidebar a:hover {
+            background-color: #4CAF50;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 270px;
+            width: calc(100% - 270px);
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
         }
 
         /* Card Style */
-        .coin-section, .user-section {
-            background-color: #222; /* Dark card background */
+        .coin-section, .user-section, .personal-wallet-section {
+            background-color: #222;
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-            width: 48%; /* Set width to 48% for side-by-side layout */
+            width: 48%;
             min-height: 300px;
             margin-bottom: 20px;
         }
 
-        .coin-section {
-            width: 48%;
-        }
-
-        .coin, .user-name {
+        .coin {
             font-size: 24px;
             font-weight: bold;
             margin-bottom: 10px;
-            color: #4CAF50; /* Green color for coins */
+            color: #4CAF50;
         }
 
         .balance, .usd-value, .total-balance {
             font-size: 30px;
             margin-top: 10px;
-            color: #ccc; /* Light text for balances */
+            color: #ccc;
         }
 
         .usd-value {
-            color: #ff9800; /* Orange color for USD */
+            color: #ff9800;
         }
 
         .total-balance {
-            color: #4CAF50; /* Green color for total balance */
+            color: #4CAF50;
         }
 
         .update-button, .add-user-button {
@@ -71,16 +113,15 @@
             cursor: pointer;
             font-size: 18px;
             margin-top: 20px;
-            transition: background-color 0.3s ease;
             display: block;
             width: 100%;
+            transition: background-color 0.3s ease;
         }
 
         .update-button:hover, .add-user-button:hover {
             background-color: #0056b3;
         }
 
-        /* User List Styling */
         .user-list {
             list-style-type: none;
             padding: 0;
@@ -89,7 +130,7 @@
 
         .user-list-item {
             padding: 15px;
-            background-color: #333; /* Dark background for user list */
+            background-color: #333;
             margin-bottom: 15px;
             border-radius: 8px;
             cursor: pointer;
@@ -102,12 +143,12 @@
         }
 
         .user-list-item:hover {
-            background-color: #444; /* Slightly lighter dark color for hover */
+            background-color: #444;
         }
 
         .user-list-item button {
             padding: 8px 16px;
-            background-color: #4CAF50; /* Green button for user actions */
+            background-color: #4CAF50;
             color: white;
             border: none;
             border-radius: 6px;
@@ -116,13 +157,13 @@
         }
 
         .user-list-item button:hover {
-            background-color: #45a049; /* Darker green for hover */
+            background-color: #45a049;
         }
 
         .user-details {
             margin-top: 15px;
             padding: 10px;
-            background-color: #444; /* Dark background for user details */
+            background-color: #444;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         }
@@ -133,11 +174,11 @@
         }
 
         .user-details strong {
-            color: #4CAF50; /* Green for important details */
+            color: #4CAF50;
         }
 
         .console-output {
-            background-color: #333; /* Dark console output background */
+            background-color: #333;
             padding: 15px;
             border-radius: 8px;
             font-family: 'Courier New', Courier, monospace;
@@ -146,7 +187,7 @@
             height: 300px;
             overflow-y: scroll;
             border: 2px solid #4CAF50;
-            color: #fff; /* White text in console */
+            color: #fff;
         }
 
         .total-users {
@@ -154,183 +195,233 @@
             color: #ff9800;
             margin-top: 20px;
         }
+
+        /* Modal Styles */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgba(0, 0, 0, 0.5); /* Black with opacity */
+            padding-top: 60px;
+        }
+
+        .modal-content {
+            background-color: #333;
+            color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            width: 80%;
+            max-width: 500px;
+            margin: auto;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: #000;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
     </style>
 </head>
 <body>
-    <div style="width: 100%; text-align: center;">
-        <h1>Crypto Marketplace - Admin Panel</h1>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <h2>Admin Panel</h2>
+        <a href="#">Dashboard</a>
+        <a href="#">Users</a>
+        <a href="#">Transactions</a>
+        <a href="#">Products</a>
+        <a href="#">Settings</a>
+    </div>
 
-        <!-- Coins Section -->
-        <div class="coin-section">
-            <div class="coin">Bitcoin (BTC)</div>
-            <div class="balance" id="btcBalance">0.0000 BTC</div>
-            <div class="usd-value" id="btcUSD">0.00 USD</div>
+    <!-- Main Content -->
+    <div class="main-content">
+        <div style="width: 100%; text-align: center;">
+            <h1>Crypto Marketplace - Admin Panel</h1>
 
-            <div class="coin">Ethereum (ETH)</div>
-            <div class="balance" id="ethBalance">0.0000 ETH</div>
-            <div class="usd-value" id="ethUSD">0.00 USD</div>
+            <!-- Personal Wallet Section -->
+            <div class="personal-wallet-section">
+                <div class="coin">Personal Wallet</div>
+                <div class="coin">Bitcoin (BTC)</div>
+                <div class="balance" id="personalBTC">0.0000 BTC</div>
+                <div class="usd-value" id="personalBTCUSD">0.00 USD</div>
 
-            <div class="coin">Litecoin (LTC)</div>
-            <div class="balance" id="ltcBalance">0.0000 LTC</div>
-            <div class="usd-value" id="ltcUSD">0.00 USD</div>
+                <div class="coin">Ethereum (ETH)</div>
+                <div class="balance" id="personalETH">0.0000 ETH</div>
+                <div class="usd-value" id="personalETHUSD">0.00 USD</div>
 
-            <div class="coin">USD Balance</div>
-            <div class="balance" id="usdBalance">0.00 USD</div>
+                <div class="coin">Litecoin (LTC)</div>
+                <div class="balance" id="personalLTC">0.0000 LTC</div>
+                <div class="usd-value" id="personalLTCUSD">0.00 USD</div>
 
-            <button class="update-button" onclick="updateBalances()">Update Balances</button>
-        </div>
+                <div class="coin">USD Balance</div>
+                <div class="balance" id="personalUSD">0.00 USD</div>
 
-        <!-- Users Section -->
-        <div class="user-section">
-            <div class="coin">Users</div>
-            <ul class="user-list" id="userList">
-                <!-- User list will be populated here -->
-            </ul>
-            <button class="add-user-button" onclick="addRandomUser()">Add Random User</button>
-            <div class="total-users" id="totalUsers">Total Users: 0</div>
+                <button class="update-button" onclick="updatePersonalWallet()">Update Personal Wallet</button>
+            </div>
+
+            <!-- Coins Section -->
+            <div class="coin-section">
+                <div class="coin">Bitcoin (BTC)</div>
+                <div class="balance" id="btcBalance">0.0000 BTC</div>
+                <div class="usd-value" id="btcUSD">0.00 USD</div>
+
+                <div class="coin">Ethereum (ETH)</div>
+                <div class="balance" id="ethBalance">0.0000 ETH</div>
+                <div class="usd-value" id="ethUSD">0.00 USD</div>
+
+                <div class="coin">Litecoin (LTC)</div>
+                <div class="balance" id="ltcBalance">0.0000 LTC</div>
+                <div class="usd-value" id="ltcUSD">0.00 USD</div>
+
+                <div class="coin">USD Balance</div>
+                <div class="balance" id="usdBalance">0.00 USD</div>
+
+                <button class="update-button" onclick="updateBalances()">Update Balances</button>
+            </div>
+
+            <!-- Users Section -->
+            <div class="user-section">
+                <h3>Users</h3>
+                <ul id="userList" class="user-list"></ul>
+                <p class="total-users" id="totalUsers">Total Users: 0</p>
+                <button class="add-user-button" onclick="addRandomUser()">Add Random User</button>
+            </div>
         </div>
     </div>
 
-    <!-- Console Output -->
-    <div class="console-output" id="consoleOutput">
-        <p>Loading simulation...</p>
+    <!-- Modal for User Details -->
+    <div id="userModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h3>User Details</h3>
+            <p><strong>Name:</strong> <span id="modalUserName"></span></p>
+            <p><strong>BTC Balance:</strong> <span id="modalBTCBalance"></span></p>
+            <p><strong>ETH Balance:</strong> <span id="modalETHBalance"></span></p>
+            <p><strong>LTC Balance:</strong> <span id="modalLTCBalance"></span></p>
+            <p><strong>USD Balance:</strong> <span id="modalUSDBalance"></span></p>
+            <p><strong>Transactions Made:</strong> <span id="modalTransactionsMade"></span></p>
+            <p><strong>Products Sold:</strong> <span id="modalProductsSold"></span></p>
+        </div>
     </div>
 
     <script>
-        // Initialize coin prices (randomly generated for simulation, now in millions)
+        // Cryptocurrency prices in USD
         const coinPrices = {
-            BTC: 20000000,  // 20 million per BTC
-            ETH: 1500000,   // 1.5 million per ETH
-            LTC: 100000     // 100 thousand per LTC
+            BTC: 30000,  // Example BTC price in USD
+            ETH: 2000,   // Example ETH price in USD
+            LTC: 150      // Example LTC price in USD
         };
 
-        // Function to generate a fixed USD balance for user
-        function generateFixedBalance() {
-            return 10000;  // Set the balance to $10,000 for all users
+        // Generate random USD amount
+        function generateRandomUSD() {
+            return Math.random() * (50000 - 1000) + 1000;
         }
 
-        // Generate random transaction and product data for users
+        // Generate random user stats (transactions, products sold)
         function generateRandomUserStats() {
-            const transactionsMade = Math.floor(Math.random() * 100) + 1;
-            const productsSold = Math.floor(Math.random() * 50) + 1;
-            return { transactionsMade, productsSold };
-        }
-
-        // Function to update all balances (simulating a marketplace update)
-        function updateBalances() {
-            // Update coin prices (for simulation purposes)
-            coinPrices.BTC = Math.random() * (22000000 - 18000000) + 18000000;
-            coinPrices.ETH = Math.random() * (1800000 - 1300000) + 1300000;
-            coinPrices.LTC = Math.random() * (120000 - 80000) + 80000;
-
-            // Update coin balances and USD values for display
-            document.getElementById("btcUSD").textContent = "$" + (coinPrices.BTC * 0.5).toFixed(2); // Example: 0.5 BTC
-            document.getElementById("ethUSD").textContent = "$" + (coinPrices.ETH * 2).toFixed(2); // Example: 2 ETH
-            document.getElementById("ltcUSD").textContent = "$" + (coinPrices.LTC * 10).toFixed(2); // Example: 10 LTC
-
-            document.getElementById("btcBalance").textContent = "0.5 BTC";
-            document.getElementById("ethBalance").textContent = "2.0 ETH";
-            document.getElementById("ltcBalance").textContent = "10 LTC";
-            document.getElementById("usdBalance").textContent = "$10,000"; // Fixed USD balance
-
-            logToConsole("Coin prices and balances updated.");
-        }
-
-        // Function to add a random user to the marketplace with $10,000 balance
-        function addRandomUser() {
-            const userName = 'User' + Math.floor(Math.random() * 1000);
-            const user = {
-                name: userName,
-                btcBalance: 0.5, // Example: Fixed 0.5 BTC
-                ethBalance: 2.0, // Example: Fixed 2.0 ETH
-                ltcBalance: 10,  // Example: Fixed 10 LTC
-                usdBalance: 10000, // Fixed USD balance for the user
-                transactionsMade: generateRandomUserStats().transactionsMade,
-                productsSold: generateRandomUserStats().productsSold
+            return {
+                transactionsMade: Math.floor(Math.random() * 200),
+                productsSold: Math.floor(Math.random() * 50)
             };
+        }
 
+        // Add a random user
+        function addRandomUser() {
+            const user = {
+                name: "User " + (users.length + 1),
+                btcBalance: Math.random() * 5,  // Random between 0 and 5 BTC
+                ethBalance: Math.random() * 50,  // Random between 0 and 50 ETH
+                ltcBalance: Math.random() * 100,  // Random between 0 and 100 LTC
+                usdBalance: generateRandomUSD(),
+                ...generateRandomUserStats()
+            };
             users.push(user);
             renderUserList();
-            logToConsole(`New user added: ${userName}`);
         }
 
-        // Function to calculate and display the total account balance for the user
-        function getTotalBalance(user) {
-            const btcUSD = coinPrices.BTC * user.btcBalance;
-            const ethUSD = coinPrices.ETH * user.ethBalance;
-            const ltcUSD = coinPrices.LTC * user.ltcBalance;
-            const usd = user.usdBalance;
-
-            return (btcUSD + ethUSD + ltcUSD + usd).toFixed(2);
-        }
-
-        // Function to render the user list on the page
+        // Render the user list
         function renderUserList() {
-            const userList = document.getElementById('userList');
-            const totalUsers = document.getElementById('totalUsers');
-            userList.innerHTML = '';
+            const userListDiv = document.getElementById('userList');
+            userListDiv.innerHTML = ''; // Clear existing users
 
             users.forEach(user => {
-                const li = document.createElement('li');
-                li.className = 'user-list-item';
-                const totalBalance = getTotalBalance(user);
-                li.innerHTML = `
-                    <span class="user-name">${user.name}</span>
-                    <span>Total Balance: $${totalBalance}</span>
-                    <span>
-                        <button onclick="viewUserDetails('${user.name}')">View Details</button>
-                        <button onclick="killUser('${user.name}')">Kill User</button>
-                    </span>
+                const listItem = document.createElement('li');
+                listItem.classList.add('user-list-item');
+                listItem.innerHTML = `
+                    ${user.name} - Total Balance: $${getTotalBalance(user).toFixed(2)}
+                    <button onclick="viewUserDetails('${user.name}')">View Details</button>
                 `;
-                userList.appendChild(li);
+                userListDiv.appendChild(listItem);
             });
 
-            totalUsers.textContent = `Total Users: ${users.length}`;
+            document.getElementById('totalUsers').textContent = `Total Users: ${users.length}`;
         }
 
-        // Function to view user details in the console
+        // Calculate total balance (USD)
+        function getTotalBalance(user) {
+            return user.usdBalance + (user.btcBalance * coinPrices.BTC) + (user.ethBalance * coinPrices.ETH) + (user.ltcBalance * coinPrices.LTC);
+        }
+
+        // View user details in a modal
         function viewUserDetails(userName) {
             const user = users.find(u => u.name === userName);
-            logToConsole(`Viewing details for ${userName}:`);
-            logToConsole(`BTC: ${user.btcBalance} | ETH: ${user.ethBalance} | LTC: ${user.ltcBalance} | USD: $${user.usdBalance}`);
-            logToConsole(`Transactions Made: ${user.transactionsMade} | Products Sold: ${user.productsSold}`);
-            
-            // Show user details in a styled container
-            const userDetailsDiv = document.createElement('div');
-            userDetailsDiv.className = 'user-details';
-            userDetailsDiv.innerHTML = `
-                <span><strong>Transactions Made:</strong> ${user.transactionsMade}</span>
-                <span><strong>Products Sold:</strong> ${user.productsSold}</span>
-            `;
-            document.body.appendChild(userDetailsDiv);
+
+            document.getElementById('modalUserName').textContent = user.name;
+            document.getElementById('modalBTCBalance').textContent = user.btcBalance + ' BTC';
+            document.getElementById('modalETHBalance').textContent = user.ethBalance + ' ETH';
+            document.getElementById('modalLTCBalance').textContent = user.ltcBalance + ' LTC';
+            document.getElementById('modalUSDBalance').textContent = '$' + user.usdBalance.toFixed(2);
+            document.getElementById('modalTransactionsMade').textContent = user.transactionsMade;
+            document.getElementById('modalProductsSold').textContent = user.productsSold;
+
+            document.getElementById('userModal').style.display = 'block';
         }
 
-        // Function to kill a user (remove from the list)
-        function killUser(userName) {
-            const userIndex = users.findIndex(u => u.name === userName);
-            if (userIndex !== -1) {
-                users.splice(userIndex, 1);
-                renderUserList();
-                logToConsole(`User ${userName} has been killed (removed).`);
-            }
+        // Close the modal
+        function closeModal() {
+            document.getElementById('userModal').style.display = 'none';
         }
 
-        // Function to log admin actions in the console
-        function logToConsole(message) {
-            const consoleOutput = document.getElementById('consoleOutput');
-            const newLog = document.createElement('p');
-            newLog.textContent = `[ADMIN] ${message}`;
-            consoleOutput.appendChild(newLog);
+        // Initialize users array
+        let users = [];
 
-            // Keep console scrolled to the bottom
-            consoleOutput.scrollTop = consoleOutput.scrollHeight;
+        // Personal Wallet Update
+        function updatePersonalWallet() {
+            document.getElementById('personalBTC').textContent = (Math.random() * 5).toFixed(4) + ' BTC';
+            document.getElementById('personalBTCUSD').textContent = '$' + (Math.random() * 50000).toFixed(2);
+            document.getElementById('personalETH').textContent = (Math.random() * 50).toFixed(4) + ' ETH';
+            document.getElementById('personalETHUSD').textContent = '$' + (Math.random() * 100000).toFixed(2);
+            document.getElementById('personalLTC').textContent = (Math.random() * 100).toFixed(4) + ' LTC';
+            document.getElementById('personalLTCUSD').textContent = '$' + (Math.random() * 15000).toFixed(2);
+            document.getElementById('personalUSD').textContent = '$' + (Math.random() * 50000).toFixed(2);
         }
 
-        // Initialize user data
-        const users = [];
-
-        // Initially render empty user list
-        renderUserList();
+        // Simulate updating the balances
+        function updateBalances() {
+            document.getElementById('btcBalance').textContent = (Math.random() * 5).toFixed(4) + ' BTC';
+            document.getElementById('btcUSD').textContent = '$' + (Math.random() * 50000).toFixed(2);
+            document.getElementById('ethBalance').textContent = (Math.random() * 50).toFixed(4) + ' ETH';
+            document.getElementById('ethUSD').textContent = '$' + (Math.random() * 100000).toFixed(2);
+            document.getElementById('ltcBalance').textContent = (Math.random() * 100).toFixed(4) + ' LTC';
+            document.getElementById('ltcUSD').textContent = '$' + (Math.random() * 15000).toFixed(2);
+            document.getElementById('usdBalance').textContent = '$' + (Math.random() * 50000).toFixed(2);
+        }
     </script>
 </body>
 </html>
+
